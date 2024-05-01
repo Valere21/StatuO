@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>CategorieSelector.qml</file>
+        <file>list/IndicatorByCategorie.qml</file>
+        <file>list/IndicatorTitle.qml</file>
+        <file>list/ListIndicatorCategorie.qml</file>
+        <file>list/ListIndicatorTitle.qml</file>
+        <file>Scenario.qml</file>
+        <file>RectDragDrop.qml</file>
+        <file>image/dlFile.jpg</file>
+    </qresource>
+</RCC>

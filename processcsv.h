@@ -8,17 +8,17 @@
 
 
 class IndicatorProperty;
-class Operation;
+class Operator;
 class ProcessCsv : public QObject
 {
+    Q_OBJECT
 
 public:
 
-    Q_OBJECT
 
     ProcessCsv();
-    ProcessCsv(Enum::FileType file, Enum::Filter filter, Enum::Spec spec);
-
+//    ProcessCsv(Enum::FileType file, Enum::Filter filter, Enum::Spec spec);
+    ~ProcessCsv();
 
     //Initialise les pairs de m_listFilter avec le nom de chaque mot-cle. membre->first de chaque pair = les noms de m_filter
     void setListFilterName();
@@ -42,7 +42,7 @@ public:
     //Renvoie la somme de filter, de la catégorie columnName,
     // QList<QPair<QString, int>> sumRoadByLine(FileType fileType, QString columnTypeName, QString filter);
 
-    // QList<QPair<QString, int>> computeFilter(FileType fileType, Filter filter, Spec spec, Operation operation);
+//     QList<QPair<QString, int>> computeFilter(FileType fileType, Filter filter, Spec spec, Operation operation);
 
     // QList<QPair<QString, int>> filterFct(FileType fileType, QString columnTypeName, QString filter);
 
@@ -68,28 +68,21 @@ public:
     //9
     int sumEffectiveHour();
 
-
-
     QList<QPair<QString, int> *> listFilter() const;
     void setListFilter(const QList<QPair<QString, int> *> &newListFilter);
 
-private:
 
-    IndicatorProperty   *m_indicator = nullptr;
-    Operation           *m_operation = nullptr;
+protected:
 
-    QString m_fileTrips = "C:\\QtProject\\Hastus\\trips-LOT1_TR_02-T1T2T5T6-Semaine-99.csv";
-    QString m_fileBlocks = "C:\\QtProject\\Hastus\\blocks-LOT1_TR_02 T1T2T5T6-Semaine-99.csv";
-    QString m_fileDuties = "C:\\QtProject\\Hastus\\file1.csv";
-    QString m_fileBreaks = "C:\\QtProject\\Hastus\\file2.csv";
-
-    //Liste des routes différentes
     QStringList m_listRoadNameTrips;
     QStringList m_listRoadNameBlocks;
     QStringList m_listRoadNameDuties;
     QStringList m_listRoadNameBreaks;
 
-
+    QString m_fileTrips = "C:\\QtProject\\Hastus\\trips-LOT1_TR_02-T1T2T5T6-Semaine-99.csv";
+    QString m_fileBlocks = "C:\\QtProject\\Hastus\\blocks-LOT1_TR_02 T1T2T5T6-Semaine-99.csv";
+    QString m_fileDuties = "C:\\QtProject\\Hastus\\file1.csv";
+    QString m_fileBreaks = "C:\\QtProject\\Hastus\\file2.csv";
 
     //Liste des noms de filtres. Ils sont à ajoutées manuellement
     QStringList m_filter = {"Route","Type","BlkRoute", "Block Route", "Entrées","Sorties", "semaine", "TrpType"};

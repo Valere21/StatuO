@@ -5,19 +5,11 @@
 
 class Enum
 {
-    Q_OBJECT
+
 public:
     Enum();
 
-
-    enum FileType{
-        Trips,
-        Blocks,
-        Duties,
-        Breaks
-    };
-
-    enum class Filter {
+    enum Filter {
         TRP_REG_OPP,
         TRP_DH,
         TRP_IN_OUT,
@@ -26,8 +18,13 @@ public:
         DTY_VALID,
         DTY_INVALID
     };
-
-    enum class Spec {
+    enum FileType{
+        Trips,
+        Blocks,
+        Duties,
+        Breaks
+    };
+    enum Spec {
         None,
         VEH_TASK_NUMBER,
         TRP_DISTANCE,
@@ -53,9 +50,6 @@ public:
         DTY_GUARANTEE,
         SPELL_GUARANTEE
     };
-
-
-
     enum Operation{
         Count,
         CountFilter,
@@ -71,7 +65,6 @@ public:
         SumFilterSpec,
         SumSpec
     };
-
 };
 
 #endif // ENUM_H

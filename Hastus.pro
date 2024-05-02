@@ -1,19 +1,19 @@
 QT += quick
 
 SOURCES += \
+        Operator.cpp \
         basetheme.cpp \
         enum.cpp \
         indicatorproperty.cpp \
         main.cpp \
-        operation.cpp \
         processcsv.cpp
 
 
 HEADERS += \
+    Operator.h \
     basetheme.h \
     enum.h \
     indicatorproperty.h \
-    operation.h \
     processcsv.h
 
 resources.files = main.qml

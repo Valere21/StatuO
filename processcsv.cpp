@@ -230,11 +230,12 @@ QList<QPair<QString, int> > ProcessCsv::computeFilter(FileType fileType, Filter 
 
 int ProcessCsv::sumComCourseLine()
 {
-
-    m_indicator = new IndicatorProperty(Trips, TRP_REG_OPP, None);
+    IndicatorProperty *indicator = new IndicatorProperty(Enum::Trips, Enum::TRP_REG_OPP, Enum::None);
+    Operation *operation = new Operation(indicator, Enum::CountFilter);
+    QList<QPair<QString, int>> listOperation = operation->getResult();
 
     qDebug() << Q_FUNC_INFO;
-    QList<QPair<QString, int>> list = sumRoadByLine(Trips, "TrpType", "REG");
+    QList<QPair<QString, int>> list = sumRoadByLine(Enum::Trips, Enum::TRP_REG_OPP, Enum::REG);
     for (int i = 0; i < list.size(); i++){
         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
     }
@@ -259,7 +260,7 @@ int ProcessCsv::sumInOutCourseLine()
 int ProcessCsv::sumPeakVechicule()
 {
     qDebug() << Q_FUNC_INFO;
-    QList<QPair<QString, int>> list = sumRoadByLine(Blocks, "Type", "semaine");
+    QList<QPair<QString, int>> list = sumRoadByLine(Enum::Blocks, "Type", "semaine");
     for (int i = 0; i < list.size(); i++){
         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
     }
@@ -280,7 +281,7 @@ int ProcessCsv::sumComKmLine()
 {
     qDebug() << Q_FUNC_INFO;
     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "Régulier");
-    for (int i = 0; i < list.size(); i++){
+        for (int i = 0; i < list.size(); i++){
         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
     }
     return 0;

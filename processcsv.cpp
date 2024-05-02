@@ -1,8 +1,9 @@
 #include "processcsv.h"
+#include "indicatorproperty.h"
 #include "qdebug.h"
 
-ProcessCsv::ProcessCsv(QFile file) {
-
+ProcessCsv::ProcessCsv() {
+    QFile file = m_fileTrips;
     setListFilterName();
     QElapsedTimer timer;
     timer.start();
@@ -102,18 +103,16 @@ void ProcessCsv::setListRoadPerFile(){
         }
         else
             ;
-//            qDebug() <<fileList.at(i) << " " << file->fileName() <<" " << file->errorString();
+        //            qDebug() <<fileList.at(i) << " " << file->fileName() <<" " << file->errorString();
     }
 }
 
-QList<QPair<QString,int>> ProcessCsv::sumRoadByLine(fileType fileType, QString columnTypeName, QString filter)
+QList<QPair<QString,int>> ProcessCsv::sumRoadByLine(FileType fileType, QString columnTypeName, QString filter)
 {
     QStringList listRoadNameFile;
     QString roadColumnName;
     std::unique_ptr<QFile> file(new QFile());
     QList<QPair<QString, int>> listSum;
-
-
 
 
     switch (fileType){
@@ -167,8 +166,73 @@ QList<QPair<QString,int>> ProcessCsv::sumRoadByLine(fileType fileType, QString c
     return listSum;
 }
 
+QList<QPair<QString, int> > ProcessCsv::computeFilter(FileType fileType, Filter filter, Spec spec, Operation operation)
+{
+    QStringList listRoadNameFile;
+    QString roadColumnName;
+    QString filterColumnName;
+    std::unique_ptr<QFile> file(new QFile());
+    QList<QPair<QString, int>> listSum;
+    roadColumnName =  (fileType == Trips || fileType == Blocks) ?  "BlkRoute" : "DtyRoute";
+    switch (fileType){
+    case Trips:
+        listRoadNameFile = m_listRoadNameTrips;
+        file->setFileName(m_fileTrips);
+        filterColumnName = "trpType";
+        break;
+    case Blocks:
+        listRoadNameFile = m_listRoadNameBlocks;
+        file->setFileName(m_fileBlocks);
+        filterColumnName = "trpType";
+        break;
+    case Breaks:
+        listRoadNameFile = m_listRoadNameBreaks;
+        file->setFileName(m_fileBreaks);
+        filterColumnName = "BrkType";
+        break;
+    case Duties:
+        listRoadNameFile = m_listRoadNameDuties;
+        file->setFileName(m_fileDuties);
+        filterColumnName = "DtyIsValid";
+        break;
+    default:
+        break;
+    }
+
+    qDebug() << "roadColumnName, file->fileName() " << roadColumnName << " & " << file->fileName();
+
+    if (file->open(QIODevice::ReadOnly)){
+        QTextStream stream(file.get());
+        for (int i = 0; i < listRoadNameFile.size(); i++){
+            bool firstLine = false;
+            int sum = 0;
+            while (!stream.atEnd()){
+                if (!firstLine){
+                    firstLine = true;
+                    stream.readLine();
+                }
+                else {
+                    QStringList list = stream.readLine().split(';');
+                    if (list.at(getFilterIndex(roadColumnName)) == listRoadNameFile.at(i))   {
+                        if (list.at(getFilterIndex(filterColumnName)) == filter){
+                            // qDebug() << "categorie " << listRoadNameFile.at(i) << " sum " << sum;
+                            sum += 1;
+                        }
+                    }
+                }
+            }
+            listSum.append(QPair<QString, int>(listRoadNameFile.at(i), sum));
+            sum = 0;
+        }
+    }
+    return listSum;
+}
+
 int ProcessCsv::sumComCourseLine()
 {
+
+    m_indicator = new IndicatorProperty(Trips, TRP_REG_OPP, None);
+
     qDebug() << Q_FUNC_INFO;
     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "TrpType", "REG");
     for (int i = 0; i < list.size(); i++){

@@ -1,0 +1,12 @@
+release/basetheme.o
+release/enum.o
+release/indicatorproperty.o
+release/main.o
+release/operation.o
+release/processcsv.o
+release/qrc_qml.o
+release/moc_basetheme.o
+release/moc_enum.o
+release/moc_indicatorproperty.o
+release/moc_operation.o
+release/moc_processcsv.o

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     const QUrl url(u"main.qml"_qs);
 //    BaseTheme baseTheme;
-    ProcessCsv processCsv(QFile("C:\\QtProject\\Hastus\\trips-LOT1_TR_02-T1T2T5T6-Semaine-99.csv"));
+    ProcessCsv processCsv;
 
     qmlRegisterSingletonType<BaseTheme>("BaseTheme", 1, 0, "BaseTheme", BaseTheme::baseThemeSingletonProvider);
 

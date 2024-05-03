@@ -20,17 +20,17 @@ Operator::Operator(IndicatorProperty *indicator, Enum::Operation operation): m_i
         case Enum::SumSpec: sumSpec();                  break;
         default:                                        break;
         }
-}
-else
-    qWarning() << "ERROR : Indicator Operation Failed";
+    }
+    else
+        qWarning() << "ERROR : Indicator Operation Failed";
 }
 
 void Operator::count()
 {
-    QFile *file = new QFile(m_indicator->file());
-if (file->open(QIODevice::ReadOnly)){
-        QTextStream stream(file);
-    for (int i = 0; i < m_indicator->listRoad().size(); i++){
+    QFile file = QFile(m_indicator->file());
+    if (file.open(QIODevice::ReadOnly)){
+        QTextStream stream(&file);
+        for (int i = 0; i < m_indicator->listRoad().size(); i++){
             bool firstLine = false;
             int sum = 0;
             while (!stream.atEnd()){
@@ -41,26 +41,57 @@ if (file->open(QIODevice::ReadOnly)){
                 else {
                     QStringList list = stream.readLine().split(';');
                     if (list.at(getFilterIndex(m_indicator->roadColumn())) == m_indicator->listRoad().at(i))   {
-                        if (list.at(getFilterIndex(columnTypeName)) == filter){
-                            // qDebug() << "categorie " << listRoadNameFile.at(i) << " sum " << sum;
-                            sum += 1;
-                        }
+                        sum += 1;
                     }
                 }
             }
-            listSum.append(QPair<QString, int>(listRoadNameFile.at(i), sum));
+            m_listResult.append(QPair<QString, int>(m_indicator->listRoad().at(i), sum));
             sum = 0;
+            file.seek(0);  // Réinitialise le fichier au début pour la prochaine itération
         }
+        m_indicator->setListResult(m_listResult);
     }
-
+    else {
+        qWarning() << Q_FUNC_INFO << " " << file.errorString();
+    }
 }
 
 void Operator::countFilter()
 {
+    // QFile *file = new QFile(m_indicator->file());
+    // if (file->open(QIODevice::ReadOnly)){
+    //     QTextStream stream(file);
+    //     for (int i = 0; i < m_indicator->listRoad().size(); i++){
+    //         bool firstLine = false;
+    //         int sum = 0;
+    //         while (!stream.atEnd()){
+    //             if (!firstLine){
+    //                 firstLine = true;
+    //                 stream.readLine();
+    //             }
+    //             else {
+    //                 QStringList list = stream.readLine().split(';');
+    //                 if (list.at(getFilterIndex(m_indicator->roadColumn())) == m_indicator->listRoad().at(i))   {
+    //                     if (list.at(getFilterIndex(m_indicator->filterColumn())) == m_indicator->filter()){
+    //                         // qDebug() << "categorie " << listRoadNameFile.at(i) << " sum " << sum;
+    //                         sum += 1;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         listSum.append(QPair<QString, int>(listRoadNameFile.at(i), sum));
+    //         sum = 0;
+    //     }
+    // }
 
 }
 
 void Operator::countSpec()
+{
+
+}
+
+void Operator::countFilterSpec()
 {
 
 }

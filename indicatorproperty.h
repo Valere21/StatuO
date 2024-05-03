@@ -23,7 +23,7 @@ public:
     void setSpecInfo(Enum::Spec spec);
     void computeIndicator(Enum::Operation operation);
 
-    QFile file() const;
+    QString file() const;
 
     QString roadColumn() const;
 
@@ -35,13 +35,16 @@ public:
 
     QStringList listRoad() const;
 
-protected:
+    QList<QPair<QString, int> > listResult() const;
+    void setListResult(const QList<QPair<QString, int> > &newListResult);
 
-    Operator *m_operation = nullptr;
+protected:
+    Operator *m_operator = nullptr;
+    QList<QPair<QString, int>> m_listResult;
 
     QStringList m_listRoad;
 
-    QFile m_file;
+    QString m_file;
     QString m_roadColumn;
     QString m_filterColumn;
 

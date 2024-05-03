@@ -10,6 +10,7 @@ public:
     Enum();
 
     enum Filter {
+        NO_FILTER,
         TRP_REG_OPP,
         TRP_DH,
         TRP_IN_OUT,
@@ -25,7 +26,7 @@ public:
         Breaks
     };
     enum Spec {
-        None,
+        NO_SPEC,
         VEH_TASK_NUMBER,
         TRP_DISTANCE,
         TRP_DURATION,

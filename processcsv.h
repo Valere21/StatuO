@@ -18,7 +18,7 @@ public:
 
     ProcessCsv();
 //    ProcessCsv(Enum::FileType file, Enum::Filter filter, Enum::Spec spec);
-    ~ProcessCsv();
+    // ~ProcessCsv();
 
     //Initialise les pairs de m_listFilter avec le nom de chaque mot-cle. membre->first de chaque pair = les noms de m_filter
     void setListFilterName();
@@ -79,15 +79,15 @@ protected:
     QStringList m_listRoadNameDuties;
     QStringList m_listRoadNameBreaks;
 
-    QString m_fileTrips = "C:\\QtProject\\Hastus\\trips-LOT1_TR_02-T1T2T5T6-Semaine-99.csv";
-    QString m_fileBlocks = "C:\\QtProject\\Hastus\\blocks-LOT1_TR_02 T1T2T5T6-Semaine-99.csv";
-    QString m_fileDuties = "C:\\QtProject\\Hastus\\file1.csv";
-    QString m_fileBreaks = "C:\\QtProject\\Hastus\\file2.csv";
+    QString m_fileTrips = "C:\\QtProject\\StatuO\\trips-LOT1_TR_02-T1T2T5T6-Semaine-99.csv";
+    QString m_fileBlocks = "C:\\QtProject\\StatuO\\blocks-LOT1_TR_02 T1T2T5T6-Semaine-99.csv";
+    QString m_fileDuties = "C:\\QtProject\\StatuO\\file1.csv";
+    QString m_fileBreaks = "C:\\QtProject\\StatuO\\file2.csv";
 
     //Liste des noms de filtres. Ils sont à ajoutées manuellement
     QStringList m_filter = {"Route","Type","BlkRoute", "Block Route", "Entrées","Sorties", "semaine", "TrpType"};
     //Liste de Pair avec association du nom avec leurs index de colonne dans csv
-    QList<QPair<QString,int>*> m_listFilter;
+    QList<QPair<QString,int>> m_listFilter;
 
 
 

@@ -32,9 +32,9 @@ public:
     QList<QPair<QString, int>>getResult();
 private:
 
-    IndicatorProperty   *m_indicator = nullptr;
+    IndicatorProperty *m_indicator = nullptr;
     Enum::Operation m_operator;
-
+    QList<QPair<QString, int>> m_listResult;
 };
 
 #endif // Operator_H

@@ -28,32 +28,31 @@ Operator::Operator(IndicatorProperty *indicator, Enum::Operation operation): m_i
 void Operator::count()
 {
     QFile file = QFile(m_indicator->file());
-    if (file.open(QIODevice::ReadOnly)){
-        QTextStream stream(&file);
-        for (int i = 0; i < m_indicator->listRoad().size(); i++){
-            bool firstLine = false;
-            int sum = 0;
-            while (!stream.atEnd()){
-                if (!firstLine){
-                    firstLine = true;
-                    stream.readLine();
-                }
-                else {
-                    QStringList list = stream.readLine().split(';');
-                    if (list.at(getFilterIndex(m_indicator->roadColumn())) == m_indicator->listRoad().at(i))   {
-                        sum += 1;
-                    }
+    if (!file.open(QIODevice::ReadOnly)){
+        qWarning() << Q_FUNC_INFO << " " << file.errorString();
+        return ;
+    }
+    QTextStream stream(&file);
+    for (int i = 0; i < m_indicator->listRoad().size(); i++){
+        bool firstLine = false;
+        int sum = 0;
+        while (!stream.atEnd()){
+            if (!firstLine){
+                firstLine = true;
+                stream.readLine();
+            }
+            else {
+                QStringList list = stream.readLine().split(';');
+                if (list.at(process->getFilterIndex(m_indicator->roadColumn())) == m_indicator->listRoad().at(i))   {
+                    sum += 1;
                 }
             }
-            m_listResult.append(QPair<QString, int>(m_indicator->listRoad().at(i), sum));
-            sum = 0;
-            file.seek(0);  // Réinitialise le fichier au début pour la prochaine itération
         }
-        m_indicator->setListResult(m_listResult);
+        m_listResult.append(QPair<QString, int>(m_indicator->listRoad().at(i), sum));
+        sum = 0;
+        file.seek(0);  // Réinitialise le fichier au début pour la prochaine itération
     }
-    else {
-        qWarning() << Q_FUNC_INFO << " " << file.errorString();
-    }
+    m_indicator->setListResult(m_listResult);
 }
 
 void Operator::countFilter()

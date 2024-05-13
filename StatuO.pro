@@ -1,7 +1,7 @@
 QT += quick
 
 SOURCES += \
-        Operator.cpp \
+        operator.cpp \
         basetheme.cpp \
         enum.cpp \
         indicatorproperty.cpp \
@@ -10,7 +10,7 @@ SOURCES += \
 
 
 HEADERS += \
-    Operator.h \
+    operator.h \
     basetheme.h \
     enum.h \
     indicatorproperty.h \

@@ -14,10 +14,11 @@ Window {
 
     property var rectDragDrop
     property real syncContentY
-    onSyncContentYChanged: {
-        listIndicatorTitle.contentY = syncContentY
-        listIndicatorCategorie.contentY = syncContentY
-    }
+    // onSyncContentYChanged: {
+    //     listIndicatorTitle.contentY = syncContentY
+    //     listIndicatorTitle.yChanged()
+    //     listIndicatorCategorie.contentY = syncContentY
+    // }
 
     MenuBar {
         id: menu

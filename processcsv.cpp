@@ -14,6 +14,11 @@ ProcessCsv::ProcessCsv() {
 
 }
 
+ProcessCsv::ProcessCsv(Enum::FileType fileType, Enum::Filter filter, Enum::Spec spec, Enum::Operation operation)
+{
+
+}
+
 void ProcessCsv::setListFilterName(){
     for (int i = 0; i < m_filter.size(); i++){
         QPair<QString,int> pair(m_filter.at(i), NULL);
@@ -33,64 +38,114 @@ int ProcessCsv::getFilterIndex(QString columnName)
 }
 
 void ProcessCsv::setListFilterIndex(QString firstLine){
-
     QStringList listFirstLine = firstLine.split(';');
-    for (int i = 0; i < m_listFilter.size(); i++){
-            if (listFirstLine.contains(m_listFilter.at(i).first))
-            m_listFilter[i].second = listFirstLine.indexOf(m_listFilter.at(i).first);
+    if (listFirstLine.isEmpty()) {
+        qDebug() << "Warning: Empty header line.";
+        return;
+    }
+
+    for (int i = 0; i < m_listFilter.size(); i++) {
+        int index = listFirstLine.indexOf(m_listFilter.at(i).first);
+        if (index != -1) {
+            m_listFilter[i].second = index;
+        } else {
+            qDebug() << "Warning: Column name not found in header:" << m_listFilter.at(i).first;
+        }
     }
 }
 
-void ProcessCsv::setListRoadPerFile(){
-
-    QStringList fileList{m_fileTrips, m_fileBlocks, m_fileDuties,m_fileBreaks};
-    QList<QStringList> roadNameList{m_listRoadNameTrips, m_listRoadNameBlocks, m_listRoadNameDuties, m_listRoadNameBreaks};
+void ProcessCsv::setListRoadPerFile() {
+    QStringList fileList{m_fileTrips, m_fileBlocks, m_fileDuties, m_fileBreaks};
+    QList<QStringList*> roadNameList{&m_listRoadNameTrips, &m_listRoadNameBlocks, &m_listRoadNameDuties, &m_listRoadNameBreaks};
 
     QString roadColumnName;
-    QFile *file = nullptr;
+    QFile file;
 
-    for (int i = 0; i < fileList.size(); i++){
-        file = new QFile(fileList.at(i));
-        if (fileList.at(i) == m_fileTrips) roadColumnName = "BlkRoute";
-        if (fileList.at(i) == m_fileBlocks) roadColumnName = "BlkRoute";
-        if (fileList.at(i) == m_fileBreaks) roadColumnName = "BrkType";
-        if (fileList.at(i) == m_fileDuties) roadColumnName = "DtyIsValid";
+    for (int i = 0; i < fileList.size(); i++) {
+        file.setFileName(fileList.at(i));
+        if (fileList.at(i) == m_fileTrips || fileList.at(i) == m_fileBlocks)
+            roadColumnName = "BlkRoute";
+        else if (fileList.at(i) == m_fileBreaks)
+            roadColumnName = "BrkType";
+        else if (fileList.at(i) == m_fileDuties)
+            roadColumnName = "DtyIsValid";
 
-
-        if (file->open(QIODevice::ReadOnly)){
-            QTextStream stream(file);
+        if (file.open(QIODevice::ReadOnly)) {
+            QTextStream stream(&file);
             bool firstLine = false;
-            while (!stream.atEnd()){
-                if (!firstLine){
+            int colIndex = -1;
+            while (!stream.atEnd()) {
+                QString line = stream.readLine();
+                if (!firstLine) {
                     firstLine = true;
-                    stream.readLine();
-                }
-                else {
-                    QStringList list = stream.readLine().split(';');
-                    if (getFilterIndex(roadColumnName) == -1)
-                        break;
-                    else{
-                        QString road = list.at(getFilterIndex(roadColumnName));
-                        if (!roadNameList.at(i).contains(road)){
-                            roadNameList.value(i).append(QString(road));
-                        }
+                    colIndex = line.split(';').indexOf(roadColumnName);
+                    setListFilterIndex(line);
+                } else {
+                    QStringList list = line.split(';');
+                    if (colIndex == -1 || colIndex >= list.size())
+                        continue;
+                    QString& road = list[colIndex];
+                    if (!roadNameList[i]->contains(road)) {
+                        roadNameList[i]->append(road);
                     }
                 }
             }
+            file.close();
+        } else {
+            //qDebug() << "Could not open file:" << file.fileName() << file.errorString();
         }
-        // else
-        // qDebug() <<fileList.at(i) << " " << file->fileName() <<" " << file->errorString();
-        if (file)
-            delete file;
-        file = nullptr;
     }
 }
 
+// void ProcessCsv::setListRoadPerFile(){
+
+//     QStringList fileList{m_fileTrips, m_fileBlocks, m_fileDuties,m_fileBreaks};
+//     QList<QStringList*> roadNameList{&m_listRoadNameTrips, &m_listRoadNameBlocks, &m_listRoadNameDuties, &m_listRoadNameBreaks};
+
+//     QString roadColumnName;
+//     QFile *file = nullptr;
+
+//     for (int i = 0; i < fileList.size(); i++){
+//         file = new QFile(fileList.at(i));
+//         if (fileList.at(i) == m_fileTrips) roadColumnName = "BlkRoute";
+//         if (fileList.at(i) == m_fileBlocks) roadColumnName = "BlkRoute";
+//         if (fileList.at(i) == m_fileBreaks) roadColumnName = "BrkType";
+//         if (fileList.at(i) == m_fileDuties) roadColumnName = "DtyIsValid";
+
+
+//         if (file->open(QIODevice::ReadOnly)){
+//             QTextStream stream(file);
+//             bool firstLine = false;
+//             while (!stream.atEnd()){
+//                 if (!firstLine){
+//                     firstLine = true;
+//                     stream.readLine();
+//                 }
+//                 else {
+//                     QStringList list = stream.readLine().split(';');
+//                     if (getFilterIndex(roadColumnName) == -1)
+//                         break;
+//                     else{
+//                         QString road = list.at(getFilterIndex(roadColumnName));
+//                         if (!roadNameList.at(i)->contains(road)){
+//                             roadNameList.value(i)->append(QString(road));
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//         // else
+//         // qDebug() <<fileList.at(i) << " " << file->fileName() <<" " << file->errorString();
+//         if (file)
+//             delete file;
+//         file = nullptr;
+//     }
+// }
 
 int ProcessCsv::sumComCourseLine()
 {
     // qDebug() << Q_FUNC_INFO;
-    IndicatorProperty *indicator = new IndicatorProperty(Enum::Trips, Enum::NO_FILTER, Enum::NO_SPEC, Enum::Count);
+    IndicatorProperty *indicator = new IndicatorProperty(this, Enum::Trips, Enum::NO_FILTER, Enum::NO_SPEC, Enum::Count);
     // Operation *operation = new Operation(indicator, Enum::CountFilter);
     // QList<QPair<QString, int>> listOperation = operation->getResult();
 
@@ -103,223 +158,3 @@ int ProcessCsv::sumComCourseLine()
     indicator = nullptr;
     return 0;
 }
-
-// int ProcessCsv::sumHLPCourseLine()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "Haut-le-pied");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-// int ProcessCsv::sumInOutCourseLine()
-// {
-//     return 0;
-// }
-
-// int ProcessCsv::sumPeakVechicule()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Enum::Blocks, "Type", "semaine");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-// int ProcessCsv::sumOffPeakVechicule()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Blocks, "Type", "semaine");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-// int ProcessCsv::sumComKmLine()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "Régulier");
-//         for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-// int ProcessCsv::sumHLPKmLine()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "Haut-le-Pied");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-// int ProcessCsv::sumKmInOutLine()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "InOut");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;}
-
-// int ProcessCsv::sumEffectiveHour()
-// {
-//     qDebug() << Q_FUNC_INFO;
-//     QList<QPair<QString, int>> list = sumRoadByLine(Trips, "Type", "InOut");
-//     for (int i = 0; i < list.size(); i++){
-//         qDebug() << "Somme par ligne : " << list.at(i).first << " " << list.at(i).second;
-//     }
-//     return 0;
-// }
-
-
-
-
-
-
-
-// QList<QPair<QString,int>> ProcessCsv::sumRoadByLine(FileType fileType, QString columnTypeName, QString filter)
-// {
-//     QStringList listRoadNameFile;
-//     QString roadColumnName;
-//     std::unique_ptr<QFile> file(new QFile());
-//     QList<QPair<QString, int>> listSum;
-
-
-//     switch (fileType){
-//     case Blocks | Trips:
-//         qDebug() << ("called");
-//         listRoadNameFile = m_listRoadNameTrips;
-//         file->setFileName(m_fileTrips);
-//         roadColumnName = "BlkRoute";
-//         break;
-
-//         // case Blocks:
-//     //     listRoadNameFile = m_listRoadNameBlocks;
-//     //     file->setFileName(m_fileBlocks);
-//     //     roadColumnName = "Blk Route";
-//     //     break;
-//     case Duties | Breaks:
-//         listRoadNameFile = m_listRoadNameDuties;
-//         file->setFileName(m_fileDuties);
-//         roadColumnName = "DtyRoute";
-//         break;
-//     default:
-//         break;
-//     }
-
-//     qDebug() << "roadColumnName, file->fileName() " << roadColumnName << " & " << file->fileName();
-
-//     if (file->open(QIODevice::ReadOnly)){
-//         QTextStream stream(file.get());
-//         for (int i = 0; i < listRoadNameFile.size(); i++){
-//             bool firstLine = false;
-//             int sum = 0;
-//             while (!stream.atEnd()){
-//                 if (!firstLine){
-//                     firstLine = true;
-//                     stream.readLine();
-//                 }
-//                 else {
-//                     QStringList list = stream.readLine().split(';');
-//                     if (list.at(getFilterIndex(roadColumnName)) == listRoadNameFile.at(i))   {
-//                         if (list.at(getFilterIndex(columnTypeName)) == filter){
-//                             // qDebug() << "categorie " << listRoadNameFile.at(i) << " sum " << sum;
-//                             sum += 1;
-//                         }
-//                     }
-//                 }
-//             }
-//             listSum.append(QPair<QString, int>(listRoadNameFile.at(i), sum));
-//             sum = 0;
-//         }
-//     }
-//     return listSum;
-// }
-
-// QList<QPair<QString, int> > ProcessCsv::computeFilter(FileType fileType, Filter filter, Spec spec, Operation operation)
-// {
-//     QStringList listRoadNameFile;
-//     QString roadColumnName;
-//     QString filterColumnName;
-//     std::unique_ptr<QFile> file(new QFile());
-//     QList<QPair<QString, int>> listSum;
-//     roadColumnName =  (fileType == Trips || fileType == Blocks) ?  "BlkRoute" : "DtyRoute";
-//     switch (fileType){
-//     case Trips:
-//         listRoadNameFile = m_listRoadNameTrips;
-//         file->setFileName(m_fileTrips);
-//         filterColumnName = "trpType";
-//         break;
-//     case Blocks:
-//         listRoadNameFile = m_listRoadNameBlocks;
-//         file->setFileName(m_fileBlocks);
-//         filterColumnName = "trpType";
-//         break;
-//     case Breaks:
-//         listRoadNameFile = m_listRoadNameBreaks;
-//         file->setFileName(m_fileBreaks);
-//         filterColumnName = "BrkType";
-//         break;
-//     case Duties:
-//         listRoadNameFile = m_listRoadNameDuties;
-//         file->setFileName(m_fileDuties);
-//         filterColumnName = "DtyIsValid";
-//         break;
-//     default:
-//         break;
-//     }
-
-//     qDebug() << "roadColumnName, file->fileName() " << roadColumnName << " & " << file->fileName();
-
-//     if (file->open(QIODevice::ReadOnly)){
-//         QTextStream stream(file.get());
-//         for (int i = 0; i < listRoadNameFile.size(); i++){
-//             bool firstLine = false;
-//             int sum = 0;
-//             while (!stream.atEnd()){
-//                 if (!firstLine){
-//                     firstLine = true;
-//                     stream.readLine();
-//                 }
-//                 else {
-//                     QStringList list = stream.readLine().split(';');
-//                     if (list.at(getFilterIndex(roadColumnName)) == listRoadNameFile.at(i))   {
-//                         if (list.at(getFilterIndex(filterColumnName)) == filter){
-//                             // qDebug() << "categorie " << listRoadNameFile.at(i) << " sum " << sum;
-//                             sum += 1;
-//                         }
-//                     }
-//                 }
-//             }
-//             listSum.append(QPair<QString, int>(listRoadNameFile.at(i), sum));
-//             sum = 0;
-//         }
-//     }
-//     return listSum;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

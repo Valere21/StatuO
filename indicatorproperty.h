@@ -5,16 +5,17 @@
 
 #include "processcsv.h"
 #include "enum.h"
+#include "processcsv.h"
 
 class Operator;
-class IndicatorProperty : public ProcessCsv
+class IndicatorProperty : public QObject
 {
     Q_OBJECT
 
 public:
 
     IndicatorProperty();
-    IndicatorProperty(Enum::FileType fileType, Enum::Filter filter, Enum::Spec spec, Enum::Operation operation);
+    IndicatorProperty(ProcessCsv *process, Enum::FileType fileType, Enum::Filter filter, Enum::Spec spec, Enum::Operation operation);
 //    ~IndicatorProperty();
 
     IndicatorProperty* getProperty();
@@ -39,6 +40,9 @@ public:
     void setListResult(const QList<QPair<QString, int> > &newListResult);
 
 protected:
+
+    ProcessCsv *process;
+
     Operator *m_operator = nullptr;
     QList<QPair<QString, int>> m_listResult;
 

@@ -6,7 +6,7 @@ IndicatorProperty::IndicatorProperty()
 
 }
 
-IndicatorProperty::IndicatorProperty(Enum::FileType fileType, Enum::Filter filter, Enum::Spec spec, Enum::Operation operation){
+IndicatorProperty::IndicatorProperty(ProcessCsv *process, Enum::FileType fileType, Enum::Filter filter, Enum::Spec spec, Enum::Operation operation): ProcessCsv(){
     qDebug() << Q_FUNC_INFO;
 
     setFileInfo(fileType);
@@ -17,10 +17,10 @@ IndicatorProperty::IndicatorProperty(Enum::FileType fileType, Enum::Filter filte
 
 void IndicatorProperty::setFileInfo(Enum::FileType file)
 {
-    if (file == Enum::Trips){m_file = m_fileTrips; m_listRoad = m_listRoadNameTrips; m_roadColumn = "BlkRoute"; m_filterColumn = "TrpType";}
-    if (file == Enum::Blocks){m_file = m_fileBlocks; m_listRoad = m_listRoadNameBlocks; m_roadColumn = "BlkRoute"; m_filterColumn = "TrpType";}
-    if (file == Enum::Breaks){m_file = m_fileBreaks; m_listRoad = m_listRoadNameBreaks; m_roadColumn = "DtyRoute"; m_filterColumn = "BrkType";}
-    if (file == Enum::Duties){m_file = m_fileDuties; m_listRoad = m_listRoadNameDuties; m_roadColumn = "DtyRoute"; m_filterColumn = "DtyIsValid";}
+    if (file == Enum::Trips){m_file = m_fileTrips; m_listRoad = process->m_listRoadNameTrips; m_roadColumn = "BlkRoute"; m_filterColumn = "TrpType";}
+    if (file == Enum::Blocks){m_file = process->m_fileBlocks; m_listRoad = m_listRoadNameBlocks; m_roadColumn = "BlkRoute"; m_filterColumn = "TrpType";}
+    if (file == Enum::Breaks){m_file = process->m_fileBreaks; m_listRoad = m_listRoadNameBreaks; m_roadColumn = "DtyRoute"; m_filterColumn = "BrkType";}
+    if (file == Enum::Duties){m_file = process->m_fileDuties; m_listRoad = m_listRoadNameDuties; m_roadColumn = "DtyRoute"; m_filterColumn = "DtyIsValid";}
 }
 
 void IndicatorProperty::setFilterInfo(Enum::Filter filter)
